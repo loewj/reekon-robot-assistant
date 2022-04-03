@@ -1,13 +1,14 @@
 import {FaRobot, FaClock, FaChartLine, FaUser} from "react-icons/fa";
 import './Nav.css';
 import {NavItem} from "./NavItem";
-import {toast} from "react-toastify";
+import {toast, Flip} from "react-toastify";
 
 const showToast = () => {
     toast.warn('Page not yet implemented', {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
+        transition: Flip,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -23,7 +24,7 @@ const navItems = [
 ]
 
 export const Nav = () => (
-    <div className="nav-wrapper">
+    <div className="nav-wrapper" data-testid='nav'>
         { navItems.map(i => <NavItem
                 key={i.label}
                 icon={i.icon}

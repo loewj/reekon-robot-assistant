@@ -2,8 +2,11 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+// Mock the robot map component
+jest.mock("./components/RobotMap/RobotMap", () => ({ RobotMap: () => <></> }));
+
+test('renders app', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const appEl = screen.getByTestId('app');
+  expect(appEl).toBeInTheDocument();
 });

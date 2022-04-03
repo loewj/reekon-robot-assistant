@@ -19,9 +19,8 @@ export const RobotMapMarker: FunctionComponent<MapMarkerProps> = ({ lat, lon }) 
             viewBox="0 0 24 24"
             style={{
                 cursor: 'pointer',
-                fill: '#d00',
+                fill: '#f0832f',
                 stroke: 'none',
-                transform: `translate(${-SIZE / 2}px,${-SIZE}px)`
             }}
         >
             <path d={ICON} />
