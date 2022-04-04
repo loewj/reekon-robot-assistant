@@ -1,0 +1,10 @@
+.loading-wrapper {
+    position: absolute;
+    display: flex;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    font-size: 3rem;
+    margin: 1rem;
+    color: #f0832f;
+}

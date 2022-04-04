@@ -1,24 +1,47 @@
-import React, {FunctionComponent, useState} from 'react';
-import Map, { Popup } from 'react-map-gl';
+import React, {FunctionComponent, useEffect, useState} from 'react';
+import Map, {Popup} from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {RobotMapMarker} from "./RobotMapMarker";
 import './RobotMap.css';
 import mapboxgl from "mapbox-gl";
-import {RobotStatus} from "../../App";
+import {ToastSeverity, showToast} from "../../utils/showToast";
+import {Robot, RobotStatus} from "../../models/Robot";
+import {Loading} from "../Loading/Loading";
+import {IconButton} from "../IconButton/IconButton";
+import {FaClock, FaChartLine, FaStopCircle} from "react-icons/fa";
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 (mapboxgl as any).workerClass = require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default;
 
-interface Robot {name: string, lat: number, lon: number, status: RobotStatus}
+const robotData = [
+    { lat: 42.382561, lon: -71.059566, name: "Hammer", status: RobotStatus.IDLE, jobId: null},
+    { lat: 42.382395, lon: -71.059899, name: "Nail", status: RobotStatus.WORKING, jobId: 479283 },
+    { lat: 42.382381, lon: -71.059706, name: "Lug Nut", status: RobotStatus.CRASHED, jobId: 234477 },
+]
 
 type MapProps = {
     coords: { lat: number, lon: number },
-    robots: Robot[]
 }
 
-export const RobotMap: FunctionComponent<MapProps> = ({ coords, robots }: MapProps) => {
+export const RobotMap: FunctionComponent<MapProps> = ({ coords }: MapProps) => {
 
     const [popupInfo, setPopupInfo] = useState<null|Robot>(null);
+    const [robots, setRobots] = useState<Robot[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Mock data fetch on load
+    useEffect(() => {
+        fetchRobots();
+    }, []);
+
+    // Mock a 3 second request
+    const fetchRobots = () => {
+        setIsLoading(true);
+        setTimeout(() => {
+            setRobots(robotData)
+            setIsLoading(false);
+        }, 3000);
+    }
 
     return (
         <div className={"map-wrapper"}>
@@ -52,9 +75,44 @@ export const RobotMap: FunctionComponent<MapProps> = ({ coords, robots }: MapPro
                         <div>
                             <span><strong>Status: </strong>{popupInfo.status}</span>
                         </div>
+                        { popupInfo.jobId && (
+                            <div>
+                                <span><strong>Job ID: </strong>{popupInfo.jobId}</span>
+                            </div>
+                        ) }
+                        <div style={{ textAlign: 'center' }}>
+                            { popupInfo.status === RobotStatus.CRASHED && (
+                                <IconButton
+                                    icon={<FaChartLine/>}
+                                    onClick={() => showToast("Fetching logs...", ToastSeverity.INFO)}
+                                    color='black'
+                                >
+                                    View Logs
+                                </IconButton>
+                            ) }
+                            { popupInfo.status === RobotStatus.IDLE && (
+                                <IconButton
+                                    icon={<FaClock/>}
+                                    onClick={() => showToast("Queueing...", ToastSeverity.WARN)}
+                                    color='black'
+                                >
+                                    Queue Job
+                                </IconButton>
+                            ) }
+                            { popupInfo.status === RobotStatus.WORKING && (
+                                <IconButton
+                                    icon={<FaStopCircle/>}
+                                    onClick={() => showToast("Job terminated", ToastSeverity.ERROR)}
+                                    color='black'
+                                >
+                                    Terminate Job
+                                </IconButton>
+                            ) }
+                        </div>
                     </Popup>
                 )}
             </Map>
+            {isLoading && <Loading/>}
         </div>
     );
 }
